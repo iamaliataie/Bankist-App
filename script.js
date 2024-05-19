@@ -14,6 +14,7 @@ const tabsContainer = document.querySelector('.operations__tab-container')
 const tabsContent = document.querySelectorAll('.operations__content')
 const nav = document.querySelector('.nav')
 const header = document.querySelector('.header')
+const sections = document.querySelectorAll('.section')
 
 const openModal = function (e) {
   e.preventDefault();
@@ -100,3 +101,18 @@ const headerObserver = new IntersectionObserver(headerCallback, {
 })
 headerObserver.observe(header)
 
+const sectionsCallback = (entries, observer)=>{
+  const [entry] = entries;
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+}
+
+const sectionsObserver = new IntersectionObserver(sectionsCallback, {
+  root: null,
+  threshold: 0.20
+})
+sections.forEach(section => {
+  sectionsObserver.observe(section);
+  section.classList.add('section--hidden');
+})
