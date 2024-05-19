@@ -12,6 +12,8 @@ const section1 = document.querySelector('#section--1');
 const tabs = document.querySelectorAll('.operations__tab')
 const tabsContainer = document.querySelector('.operations__tab-container')
 const tabsContent = document.querySelectorAll('.operations__content')
+const nav = document.querySelector('.nav')
+const header = document.querySelector('.header')
 
 const openModal = function (e) {
   e.preventDefault();
@@ -42,7 +44,7 @@ btnLearnMore.addEventListener('click', ()=>{
 
 document.querySelector('.nav__links').addEventListener('click', (e) => {
   e.preventDefault();
-  if (e.target.classList.contains('nav__link')){
+  if (e.target.classList.contains('nav__link') && !e.target.classList.contains('nav__link--btn')){
     const sectionId = e.target.getAttribute('href');
     document.querySelector(sectionId).scrollIntoView({behavior: 'smooth'});
   }
@@ -67,3 +69,34 @@ tabsContainer.addEventListener('click', (e)=>{
   document.querySelector(`.operations__content--${clicked.dataset.tab}`).classList.add('operations__content--active')
 
 })
+
+const handleNavbarMouse = function(e){
+  if (e.target.classList.contains('nav__link')){
+    const activeLink = e.target;
+    const siblings = activeLink.closest('.nav').querySelectorAll('.nav__link');
+    const logo = activeLink.closest('.nav').querySelector('img');
+    siblings.forEach(link => {
+      if (link !== activeLink){
+        link.style.opacity = this;
+      }
+    })
+    logo.style.opacity = this;
+  }
+}
+
+nav.addEventListener('mouseover', handleNavbarMouse.bind(0.5))
+nav.addEventListener('mouseout', handleNavbarMouse.bind(1))
+
+const headerCallback = (entries)=>{
+  const [entry] = entries;
+  if (entry.isIntersecting) nav.classList.remove('sticky')
+    else nav.classList.add('sticky')
+}
+
+const headerObserver = new IntersectionObserver(headerCallback, {
+  root: null,
+  threshold: 0,
+  rootMargin: `-${nav.getBoundingClientRect().height}px`
+})
+headerObserver.observe(header)
+
