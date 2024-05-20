@@ -9,12 +9,13 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnLearnMore = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
-const tabs = document.querySelectorAll('.operations__tab')
-const tabsContainer = document.querySelector('.operations__tab-container')
-const tabsContent = document.querySelectorAll('.operations__content')
-const nav = document.querySelector('.nav')
-const header = document.querySelector('.header')
-const sections = document.querySelectorAll('.section')
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+const nav = document.querySelector('.nav');
+const header = document.querySelector('.header');
+const sections = document.querySelectorAll('.section');
+const images = document.querySelectorAll('img[data-src]');
 
 const openModal = function (e) {
   e.preventDefault();
@@ -116,3 +117,86 @@ sections.forEach(section => {
   sectionsObserver.observe(section);
   section.classList.add('section--hidden');
 })
+
+const imageCallback = (entries, observer)=>{
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+
+  entry.target.src = entry.target.dataset.src;
+  entry.target.addEventListener('load', ()=>{
+    entry.target.classList.remove('lazy-img');
+  })
+}
+
+const imageObserver = new IntersectionObserver(imageCallback, {
+  root: null,
+  threshold: 0.15,
+})
+
+images.forEach(image => imageObserver.observe(image))
+
+// Slider component
+function initSlider(){
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.querySelector('.dots');
+  const btnSliderRight = document.querySelector('.slider__btn--right');
+  const btnSliderLeft = document.querySelector('.slider__btn--left');
+  let currentSlide = 0;
+
+  function createSlideDots(){
+    slides.forEach((_, index)=>{
+      dotsContainer.insertAdjacentHTML('beforeend',
+        `<button class="dots__dot" data-slide=${index}></button>`
+      )
+    })
+  }
+
+  function goToSlide(slideNumber){
+    slides.forEach((slide, index)=>{
+      slide.style.transform = `translateX(${100 * (index - slideNumber)}%)`
+    })
+  }
+
+  function activeDot(slideNumber){
+    const dots = document.querySelectorAll('.dots__dot');
+    dots.forEach(dot => {
+      if (Number(dot.dataset.slide) !== slideNumber) {
+        dot.classList.remove('dots__dot--active');
+      } else dot.classList.add('dots__dot--active');
+    })
+
+  }
+
+  function nextSlide(){
+    if (currentSlide === (slides.length - 1)) currentSlide = 0;
+    else currentSlide++;
+    goToSlide(currentSlide);
+    activeDot(currentSlide);
+  }
+
+  function previousSlide(){
+    if (currentSlide === 0) currentSlide = (slides.length - 1);
+    else currentSlide--;
+    goToSlide(currentSlide);
+    activeDot(currentSlide);
+  }
+
+  createSlideDots();
+  goToSlide(0);
+  activeDot(0);
+
+  btnSliderRight.addEventListener('click', nextSlide);
+  btnSliderLeft.addEventListener('click', previousSlide);
+
+  dotsContainer.addEventListener('click', (e)=>{
+    if(e.target.classList.contains('dots__dot')){
+      const slideNumber = Number(e.target.dataset.slide);
+      currentSlide = slideNumber
+      goToSlide(currentSlide);
+      activeDot(currentSlide);
+    }
+
+  })
+}
+initSlider();
